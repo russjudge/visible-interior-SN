@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 
 
-namespace VisibleLockerInterior {
-    internal class PrefabId {
+namespace VisibleLockerInterior
+{
+    internal class PrefabId
+    {
         public const string AirBladder = "d98d673a-8992-4486-a49c-81aa058e51dc";
         public const string Battery = "d4bfebc0-a5e6-47d3-b4a7-d5e47f614ed6";
         public const string builder = "c6f3c2fd-5b80-4aaf-81c3-f056651b868c";
@@ -37,9 +39,12 @@ namespace VisibleLockerInterior {
         public const string Welder = "9ef36033-b60c-4f8b-8c3a-b15035de3116";
     }
 
-    internal class Quirk {
-        public static Quaternion GetIdealRotationByTechType(TechType techType) {
-            switch (techType) {
+    internal class Quirk
+    {
+        public static Quaternion GetIdealRotationByTechType(TechType techType)
+        {
+            switch (techType)
+            {
                 case TechType.PipeSurfaceFloater:
                 case TechType.LEDLight:
                     return new Quaternion(1, 0, 0, 0);
@@ -81,7 +86,7 @@ namespace VisibleLockerInterior {
                 case TechType.ExoHullModule2:
                 case TechType.FilteredWater:
                 case TechType.DisinfectedWater:
-                case TechType.StillsuitWater:
+                //case TechType.StillsuitWater:  "StillsuitWater" is not a valid TechType in Subnautica, as of the August 2025 update.
                 case TechType.BigFilteredWater:
                     return new Quaternion(1, 0, 0, 1);
                 case TechType.Knife:
@@ -130,8 +135,10 @@ namespace VisibleLockerInterior {
             }
         }
 
-        public static bool MustHaveAnimator(TechType techType) {
-            switch (techType) {
+        public static bool MustHaveAnimator(TechType techType)
+        {
+            switch (techType)
+            {
                 case TechType.Flashlight:
                 case TechType.Beacon:
                 case TechType.Scanner:
@@ -161,8 +168,10 @@ namespace VisibleLockerInterior {
             }
         }
 
-        public static bool IsKelp(TechType techType) {
-            switch (techType) {
+        public static bool IsKelp(TechType techType)
+        {
+            switch (techType)
+            {
                 case TechType.CreepvineSeedCluster:
                 case TechType.CreepvinePiece:
                     return true;
@@ -307,7 +316,7 @@ namespace VisibleLockerInterior {
                         new Vector3(0f, 0.08395185f, 0.06031561f),
                         new Vector3(0.1802571f, 0.1532138f, 0.3076813f)
                     )
-                },           
+                },
                 {
                     PrefabId.ReinforcedDiveSuit,
                     new Bounds(
