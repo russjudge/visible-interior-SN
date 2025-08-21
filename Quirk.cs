@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace VisibleLockerInterior
 {
-    internal class PrefabId
+    internal static class PrefabId
     {
         public const string AirBladder = "d98d673a-8992-4486-a49c-81aa058e51dc";
         public const string Battery = "d4bfebc0-a5e6-47d3-b4a7-d5e47f614ed6";

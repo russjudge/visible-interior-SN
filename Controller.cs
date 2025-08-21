@@ -17,6 +17,7 @@ namespace VisibleLockerInterior
 
         public static void UpdateInterior(StorageContainer sc)
         {
+
             if ("Locker(Clone)" != sc.prefabRoot.name) return;
             var interior = GetInteriorInstance(sc);
             var items = GetSortedItems(sc.storageRoot.gameObject);
@@ -218,6 +219,7 @@ namespace VisibleLockerInterior
             //As of the August 2025 Subnautica update, "GetItemSize" is no longer available.
             //This method appears to only be used for sorting items in the locker interior,
             // so the impact of commenting out below should be minimal.
+
             // Original code retained for reference.
             //var size1 = CraftData.GetItemSize(t1);
             //var size2 = CraftData.GetItemSize(t2);

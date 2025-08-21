@@ -3,17 +3,21 @@ using HarmonyLib;
 using System.Reflection;
 
 
-namespace VisibleLockerInterior {
-    [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
-    public class Plugin: BaseUnityPlugin {
+namespace VisibleLockerInterior
+{
+    [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
+    public class Plugin : BaseUnityPlugin
+    {
 
-        public Harmony Harmony { get; } = new Harmony(PluginInfo.PLUGIN_GUID);
+        public Harmony Harmony { get; } = new Harmony(MyPluginInfo.PLUGIN_GUID);
 
-        private void OnEnable() {
+        private void OnEnable()
+        {
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
         }
 
-        private void OnDisable() {
+        private void OnDisable()
+        {
             Harmony.UnpatchSelf();
         }
     }

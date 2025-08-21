@@ -1,14 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFramework>net481</TargetFramework>
+    <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
     <AssemblyName>VisibleLockerInterior</AssemblyName>
     <RootNamespace>VisibleLockerInterior</RootNamespace>
     <Description>Visible locker interior for Subnautica</Description>
     <Version>2.0.2</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>8.0</LangVersion>
-    <Product>VisibleLockerInterior</Product>
+    <Product>Visible Locker Interior</Product>
+    <BepInExPluginGuid>com.russjudge.visiblelockerinterior</BepInExPluginGuid>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -30,7 +31,7 @@
   <ItemGroup>
     <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
     <PackageReference Include="BepInEx.Core" Version="5.*" />
-    <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*" />
+    <PackageReference Include="BepInEx.PluginInfoProps" Version="2.1.0" />
     <PackageReference Include="UnityEngine.Modules" Version="2019.4.36" IncludeAssets="compile" />
     <Reference Update="mscorlib">
       <Private>False</Private>
@@ -53,12 +54,11 @@
     <Reference Update="System.Xml.Linq">
       <Private>False</Private>
     </Reference>
-    <Reference Include="Assembly-CSharp-firstpass_publicized">
-      <HintPath>..\..\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp-firstpass_publicized.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp_publicized">
-      <HintPath>..\..\Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>Subnautica_Data\Managed\publicized_assemblies\Assembly-CSharp-firstpass_publicized.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -68,11 +68,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="AssemblyPublicizer\" />
     <Folder Include="Subnautica_Data\Managed\publicized_assemblies\" />
   </ItemGroup>
 
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(TargetPath)" "..\..\BepInEx\plugins\"</PostBuildEvent>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 </Project>
