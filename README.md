@@ -19,6 +19,7 @@ Download released files and unpack it to BepInEx/plugins folder.
 Swim charge fins and Ultra glide fins will appear very dark without
 shining direct light (e.g. flashlight) upon them. The bug exist in
 the original object so our best bet is to wait for the fix in vanilla.
+Also, the Advanced Wiring kit and the Wiring kit are both using the Advanced Wiring Kit model.
 
 ## Support
 
