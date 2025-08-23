@@ -86,6 +86,7 @@ namespace VisibleLockerInterior
                 case TechType.ExoHullModule2:
                 case TechType.FilteredWater:
                 case TechType.DisinfectedWater:
+                case TechType.WaterFiltrationSuit:
                 //case TechType.StillsuitWater:  "StillsuitWater" is not a valid TechType in Subnautica, as of the August 2025 update.
                 case TechType.BigFilteredWater:
                     return new Quaternion(1, 0, 0, 1);
