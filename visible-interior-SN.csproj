@@ -5,7 +5,7 @@
     <AssemblyName>VisibleLockerInterior</AssemblyName>
     <RootNamespace>VisibleLockerInterior</RootNamespace>
     <Description>Visible locker interior for Subnautica</Description>
-    <Version>2.0.3</Version>
+    <Version>2.0.4</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>8.0</LangVersion>
     <Product>Visible Locker Interior</Product>
