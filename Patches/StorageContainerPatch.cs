@@ -18,7 +18,6 @@ namespace VisibleLockerInterior
         [HarmonyPostfix]
         public static void Postfix(StorageContainer __instance)
         {
-            //TODO: add logging to show whether or not this gets called in game.
 
             Controller.UpdateInterior(__instance);
         }

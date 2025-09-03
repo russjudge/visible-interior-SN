@@ -2,30 +2,56 @@
 using UnityEngine;
 using System.Linq;
 using System.Collections.Generic;
+using System.CodeDom;
 
 namespace VisibleLockerInterior
 {
     internal class Controller
     {
         private const string interiorName = "mod_LockerInterior";
-        private const int itemPerRow = 8;
-        private static readonly float[] xPos =
-            { 0.469f, 0.335f, 0.201f, 0.067f, -0.067f, -0.201f, -0.335f, -0.469f };
-        private static readonly float[] yPos =
-            { 1.58803f, 1.32938f, 0.966707f, 0.57335f, 0.288304f, 0.046258f };
+        private const int Shelves = 6;
+        private const float ShelfWidth = 1.072f;  //Will not change regardless of changes to number of slots in locker.
+        private const float topShelf = 1.541772f;
+        private const float heightOffset = 0.046258f;  //Distance from floor.
+
+        //Shelf hard-coded positions (may need to return to this if calculations don't work out
+        //   --there is no consistent position that can be mathematically determined.  won't need height offset if these are used):
+        //private static readonly float[] ShelfPosition =
+        //    { 1.58803f, 1.32938f, 0.966707f, 0.57335f, 0.288304f, 0.046258f };
+
         private const float zPos = -0.03f;
 
         public static void UpdateInterior(StorageContainer sc)
         {
+            //Changing to calculate positions instead of using hard-coded arrays.
+            // This is to attempt to support mods that change locker size.
+            //  For a test case, am using "Ramune's Customized Storage" https://www.nexusmods.com/subnautica/mods/2488
 
             if ("Locker(Clone)" != sc.prefabRoot.name) return;
             var interior = GetInteriorInstance(sc);
+            //Original hard-coded to 8 items on a row, but the storage has only 6 items on a row.
+            //However, the visual of the free-standing locker shows only 6 rows, not 8, so to be able
+            // to render 48 items, each shelf must have 8 items on it.
+            int totalSlots = sc.width * sc.height;
+            int itemsPerShelf = totalSlots / Shelves;
+
+            float itemRowSpacing = ShelfWidth / itemsPerShelf;
+
+            float columnSpacing = topShelf / Shelves;
+
             var items = GetSortedItems(sc.storageRoot.gameObject);
             var dummies = GetSortedDummies(interior);
             for (int i = 0, j = 0; i < items.Count || j < dummies.Count;)
             {
+                float x = -((i % itemsPerShelf) * itemRowSpacing - (ShelfWidth / 2 - itemRowSpacing / 2));
+
+                float y = (topShelf + heightOffset) - (i / itemsPerShelf) * columnSpacing;  //row 0 == 1.58803.  Row 5 == 0.046258.
+
+
+
+                //float y = -((i / itemsPerRow) * rowWidth - (rowWidth / 2 - 
                 var targetPosition =
-                    new Vector3(xPos[i % itemPerRow], yPos[i / itemPerRow], zPos);
+                    new Vector3(x, y, zPos);
                 int cmp =
                     i == items.Count ? 1 :
                     j == dummies.Count ? -1 :
@@ -36,12 +62,12 @@ namespace VisibleLockerInterior
                 if (cmp == -1)
                 {
                     var dummy = CreateDummy(interior, items[i]);
-                    RepositionDummy(dummy.gameObject, targetPosition);
+                    RepositionDummy(dummy.gameObject, targetPosition, itemsPerShelf);
                     i++;
                 }
                 else if (cmp == 0)
                 {
-                    RepositionDummy(dummies[j].gameObject, targetPosition);
+                    RepositionDummy(dummies[j].gameObject, targetPosition, itemsPerShelf);
                     i++; j++;
                 }
                 else
@@ -65,15 +91,24 @@ namespace VisibleLockerInterior
             return dummy;
         }
 
-        private static void RepositionDummy(GameObject dummy, Vector3 targetPosition)
+        private static void RepositionDummy(GameObject dummy, Vector3 targetPosition, int itemsPerShelf)
         {
             var bounds = GetIdealBounds(dummy);
+
             dummy.transform.localRotation = GetIdealRotation(dummy);
-            var scale = new[] {
-                0.13f / bounds.size.x,
-                0.14f / bounds.size.y,
-                0.27f / bounds.size.z
+
+            float xScale = 0.01625f * itemsPerShelf;
+
+            //was hard-coded to: 0.13, 0.14, 0.27
+            float scale = new[] {
+                xScale / bounds.size.x,
+                (xScale + 0.01f) / bounds.size.y,
+                (xScale * 2 + 0.01f) / bounds.size.z
             }.Min() * GetIdealDeltaScale(dummy);
+
+
+
+
             var offset = -bounds.center + bounds.extents.y * Vector3.up;
             dummy.transform.localScale = scale * Vector3.one;
             dummy.transform.localPosition = targetPosition + offset * scale;
@@ -140,11 +175,17 @@ namespace VisibleLockerInterior
             var comp = dummy.GetComponent<VisibleLockerInteriorDummyData>();
             if (Quirk.overrideBounds.ContainsKey(comp.prefabId))
                 return Quirk.overrideBounds[comp.prefabId];
+
             var currentRot = dummy.transform.rotation;
+
             var currentScale = dummy.transform.localScale;
+
             var currentPos = dummy.transform.localPosition;
+
             dummy.transform.rotation = GetIdealRotation(dummy);
+
             dummy.transform.localScale = Vector3.one;
+
             dummy.transform.position = Vector3.zero;
             var renderers = dummy.GetComponentsInChildren<Renderer>();
             if (renderers.Length == 0)
@@ -154,7 +195,9 @@ namespace VisibleLockerInterior
                 if (r is MeshRenderer || r is SkinnedMeshRenderer)
                     b.Encapsulate(r.bounds);
             dummy.transform.rotation = currentRot;
+
             dummy.transform.localScale = currentScale;
+
             dummy.transform.position = currentPos;
             return Quirk.overrideBounds[comp.prefabId] = b;
         }
