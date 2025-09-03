@@ -1,13 +1,13 @@
-﻿using System;
-using UnityEngine;
-using System.Linq;
+﻿using BepInEx;
 using System.Collections.Generic;
-using System.CodeDom;
+using System.Linq;
+using UnityEngine;
 
 namespace VisibleLockerInterior
 {
     internal class Controller
     {
+
         private const string interiorName = "mod_LockerInterior";
         private const int Shelves = 6;
         private const float ShelfWidth = 1.072f;  //Will not change regardless of changes to number of slots in locker.
@@ -23,6 +23,9 @@ namespace VisibleLockerInterior
 
         public static void UpdateInterior(StorageContainer sc)
         {
+            Plugin.Log(BepInEx.Logging.LogLevel.Debug, $"VisibleLockerInterior: UpdateInterior called for {sc.prefabRoot.name}");
+
+
             //Changing to calculate positions instead of using hard-coded arrays.
             // This is to attempt to support mods that change locker size.
             //  For a test case, am using "Ramune's Customized Storage" https://www.nexusmods.com/subnautica/mods/2488
@@ -112,6 +115,7 @@ namespace VisibleLockerInterior
             var offset = -bounds.center + bounds.extents.y * Vector3.up;
             dummy.transform.localScale = scale * Vector3.one;
             dummy.transform.localPosition = targetPosition + offset * scale;
+            Plugin.Log(BepInEx.Logging.LogLevel.Info, $"Placed {dummy.name}");
         }
 
         private static void SanitizeObject(GameObject obj, TechType techType)
