@@ -9,17 +9,11 @@ namespace VisibleLockerInterior
         public static void Postfix(StorageContainer __instance) =>
             Controller.UpdateInterior(__instance);
     }
-
-    //As of August 2025 update, StorageContainer.OnClose appears to be no longer available.
-    //Therefore, it is likely this code can be safely removed.
-    [HarmonyPatch(typeof(StorageContainer), "OnClose")]
+    [HarmonyPatch(typeof(StorageContainer), nameof(StorageContainer.OnClose))]
     internal class PatchCloseAction
     {
         [HarmonyPostfix]
-        public static void Postfix(StorageContainer __instance)
-        {
-
-            Controller.UpdateInterior(__instance);
-        }
+        public static void Postfix(StorageContainer __instance) =>
+            Controller.UpdateInterior(__instance); Controller.UpdateInterior(__instance);
     }
 }
