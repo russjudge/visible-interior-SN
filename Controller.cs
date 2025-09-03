@@ -13,6 +13,7 @@ namespace VisibleLockerInterior
         private const float ShelfWidth = 1.072f;  //Will not change regardless of changes to number of slots in locker.
         private const float topShelf = 1.541772f;
         private const float heightOffset = 0.046258f;  //Distance from floor.
+        private const float columnSpacing = topShelf / Shelves;
 
         //Shelf hard-coded positions (may need to return to this if calculations don't work out
         //   --there is no consistent position that can be mathematically determined.  won't need height offset if these are used):
@@ -40,7 +41,7 @@ namespace VisibleLockerInterior
 
             float itemRowSpacing = ShelfWidth / itemsPerShelf;
 
-            float columnSpacing = topShelf / Shelves;
+
 
             var items = GetSortedItems(sc.storageRoot.gameObject);
             var dummies = GetSortedDummies(interior);
