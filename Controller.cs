@@ -87,7 +87,9 @@ namespace VisibleLockerInterior
             var techType = src.GetComponent<Pickupable>()?.GetTechType() ?? TechType.None;
             var classId = src.GetComponent<PrefabIdentifier>()?.ClassId ?? "";
             dummy.SetActive(true);
+
             SanitizeObject(dummy, techType);
+
             var dummyComp = dummy.AddComponent<VisibleLockerInteriorDummyData>();
             dummyComp.techType = techType;
             dummyComp.prefabId = classId;
@@ -135,8 +137,14 @@ namespace VisibleLockerInterior
                 destroyList.AddRange(obj.GetComponents<ParticleSystem>());
                 foreach (var r in obj.GetComponents<Renderer>())
                 {
-                    if (r is MeshRenderer || r is SkinnedMeshRenderer) continue;
-                    destroyList.Add(r);
+                    if (r is MeshRenderer || r is SkinnedMeshRenderer)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        destroyList.Add(r);
+                    }
                 }
                 foreach (var b in obj.GetComponents<Behaviour>())
                 {
@@ -154,16 +162,25 @@ namespace VisibleLockerInterior
                     }
                 }
                 destroyList.Reverse();
-                foreach (var comp in destroyList) GameObject.DestroyImmediate(comp);
+                foreach (var comp in destroyList)
+                {
+                    GameObject.DestroyImmediate(comp);
+                }
             } while (destroyList.Count > 0);
 
             if (Quirk.IsKelp(techType))
                 foreach (var r in obj.GetComponents<Renderer>())
+                {
                     foreach (var m in r.materials)
+                    {
                         m.DisableKeyword("FX_KELP");
+                    }
+                }
 
             foreach (Transform childTransform in obj.transform)
+            {
                 SanitizeObject(childTransform.gameObject, techType);
+            }
         }
 
         private static Quaternion GetIdealRotation(GameObject dummy)
