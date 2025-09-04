@@ -18,6 +18,17 @@ namespace VisibleLockerInterior
     {
         [HarmonyPostfix]
         public static void Postfix(StorageContainer __instance) =>
-            Controller.UpdateInterior(__instance); Controller.UpdateInterior(__instance);
+            Controller.UpdateInterior(__instance);
     }
+
+    //[HarmonyPatch(typeof(ItemsContainer), nameof(ItemsContainer.OnResize))]
+    //internal class PatchItemsContainerResize
+    //{
+    //    [HarmonyPostfix]
+    //    public static void PostFix(ItemsContainer __instance)
+    //    {
+            
+    //    }
+    //}
+
 }

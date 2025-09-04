@@ -2,58 +2,55 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static HandReticle;
 
 namespace VisibleLockerInterior
 {
     internal class Controller
     {
-
+        private const int BaselineItemsPerShelf = 8;
         private const string interiorName = "mod_LockerInterior";
         private const int Shelves = 6;
         private const float ShelfWidth = 1.072f;  //Will not change regardless of changes to number of slots in locker.
-        private const float topShelf = 1.541772f;
-        private const float heightOffset = 0.046258f;  //Distance from floor.
-        private const float columnSpacing = topShelf / Shelves;
-
-        //Shelf hard-coded positions (may need to return to this if calculations don't work out
-        //   --there is no consistent position that can be mathematically determined.  won't need height offset if these are used):
-        //private static readonly float[] ShelfPosition =
-        //    { 1.58803f, 1.32938f, 0.966707f, 0.57335f, 0.288304f, 0.046258f };
+       
+        private static int totalSlots = 48;
+        //Shelves are at varying positions--they aren't consistent enough to use mathematics to calculate.
+        private static readonly float[] ShelfPosition =
+            { 1.58803f, 1.32938f, 0.966707f, 0.57335f, 0.288304f, 0.046258f };
 
         private const float zPos = -0.03f;
 
         public static void UpdateInterior(StorageContainer sc)
         {
-            Plugin.Log(BepInEx.Logging.LogLevel.Debug, $"VisibleLockerInterior: UpdateInterior called for {sc.prefabRoot.name}");
-
+            if ("Locker(Clone)" != sc.prefabRoot.name) return;
+            Plugin.Log(BepInEx.Logging.LogLevel.Info, $"VisibleLockerInterior: UpdateInterior called for {sc.prefabRoot.name}. Storage Container height={sc.height}, width={sc.width}, internal container size={sc.container.sizeX}x{sc.container.sizeY}");
+           
 
             //Changing to calculate positions instead of using hard-coded arrays.
             // This is to attempt to support mods that change locker size.
             //  For a test case, am using "Ramune's Customized Storage" https://www.nexusmods.com/subnautica/mods/2488
 
-            if ("Locker(Clone)" != sc.prefabRoot.name) return;
+            
             var interior = GetInteriorInstance(sc);
             //Original hard-coded to 8 items on a row, but the storage has only 6 items on a row.
             //However, the visual of the free-standing locker shows only 6 rows, not 8, so to be able
             // to render 48 items, each shelf must have 8 items on it.
-            int totalSlots = sc.width * sc.height;
+            //int totalSlots = sc.container.sizeX * sc.container.sizeY;
+
             int itemsPerShelf = totalSlots / Shelves;
 
             float itemRowSpacing = ShelfWidth / itemsPerShelf;
-
+            
 
 
             var items = GetSortedItems(sc.storageRoot.gameObject);
             var dummies = GetSortedDummies(interior);
-            for (int i = 0, j = 0; i < items.Count || j < dummies.Count;)
+            for (int i = 0, j = 0; (i < items.Count && i < totalSlots) || (j < dummies.Count && j < totalSlots);)
             {
                 float x = -((i % itemsPerShelf) * itemRowSpacing - (ShelfWidth / 2 - itemRowSpacing / 2));
 
-                float y = (topShelf + heightOffset) - (i / itemsPerShelf) * columnSpacing;  //row 0 == 1.58803.  Row 5 == 0.046258.
+                float y = ShelfPosition[(i / itemsPerShelf)];
 
-
-
-                //float y = -((i / itemsPerRow) * rowWidth - (rowWidth / 2 - 
                 var targetPosition =
                     new Vector3(x, y, zPos);
                 int cmp =
@@ -82,6 +79,7 @@ namespace VisibleLockerInterior
             }
         }
 
+     
         private static GameObject CreateDummy(GameObject interior, GameObject src)
         {
             var dummy = GameObject.Instantiate(src, interior.transform);
@@ -90,7 +88,13 @@ namespace VisibleLockerInterior
             dummy.SetActive(true);
 
             SanitizeObject(dummy, techType);
-
+            if (techType == TechType.WiringKit || techType == TechType.AdvancedWiringKit)
+            {
+                Plugin.Log(BepInEx.Logging.LogLevel.Debug, $"Creating dummy, techType={techType}, classId = {classId}");
+                Plugin.Log(BepInEx.Logging.LogLevel.Debug, $"gameObject Name={dummy.gameObject.name}");
+                Plugin.Log(BepInEx.Logging.LogLevel.Debug, $"gameObject.transform.name={dummy.gameObject.transform.name}");
+                
+            }
             var dummyComp = dummy.AddComponent<VisibleLockerInteriorDummyData>();
             dummyComp.techType = techType;
             dummyComp.prefabId = classId;
@@ -101,24 +105,27 @@ namespace VisibleLockerInterior
         {
             var bounds = GetIdealBounds(dummy);
 
+            const float magicNumber = 0.13f;  //Original programmer used this figure--for unknown reason.  That's why it's magic.
+
+
             dummy.transform.localRotation = GetIdealRotation(dummy);
 
             float xScale = 0.01625f * itemsPerShelf;
 
             //was hard-coded to: 0.13, 0.14, 0.27
             float scale = new[] {
-                xScale / bounds.size.x,
-                (xScale + 0.01f) / bounds.size.y,
-                (xScale * 2 + 0.01f) / bounds.size.z
+                magicNumber / (bounds.size.x * (itemsPerShelf / BaselineItemsPerShelf)),
+                (magicNumber + 0.01f) / (bounds.size.y * (itemsPerShelf / BaselineItemsPerShelf)),
+                (magicNumber * 2 + 0.01f) / (bounds.size.z * (itemsPerShelf / BaselineItemsPerShelf))
             }.Min() * GetIdealDeltaScale(dummy);
 
-
-
-
             var offset = -bounds.center + bounds.extents.y * Vector3.up;
+
             dummy.transform.localScale = scale * Vector3.one;
+
             dummy.transform.localPosition = targetPosition + offset * scale;
-            Plugin.Log(BepInEx.Logging.LogLevel.Info, $"Placed {dummy.name}");
+
+            Plugin.Log(BepInEx.Logging.LogLevel.Info, $"Placed {dummy.name}, scale={scale}");
         }
 
         private static void SanitizeObject(GameObject obj, TechType techType)
@@ -213,9 +220,14 @@ namespace VisibleLockerInterior
             if (renderers.Length == 0)
                 return new Bounds(dummy.transform.position, Vector3.zero);
             var b = renderers[0].bounds;
+
             foreach (Renderer r in renderers)
+            {
                 if (r is MeshRenderer || r is SkinnedMeshRenderer)
+                {
                     b.Encapsulate(r.bounds);
+                }
+            }
             dummy.transform.rotation = currentRot;
 
             dummy.transform.localScale = currentScale;
@@ -303,4 +315,6 @@ namespace VisibleLockerInterior
         public TechType techType;
         public string prefabId;
     }
+   
+
 }
